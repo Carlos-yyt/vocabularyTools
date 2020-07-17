@@ -31,7 +31,8 @@ def txt2excel(file_path, audio_path):
     output_file_url = path + '\\' + filename + '.xls'
 
     """逐行读入"""
-    with open(input_file_url, encoding='utf-8') as file_object:
+    with open(input_file_url, encoding='utf-8'
+              ) as file_object:
         lines = []
         for line in file_object:  # 逐行读取
             lines.append(line)
