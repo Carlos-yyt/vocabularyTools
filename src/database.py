@@ -5,16 +5,16 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-def create_dictionaries(user_name, src_type, src_file_url):
+def create_dictionaries(dictionary_name, src_type, src_file_url):
     """
     根据用户提供的单词表创建一个该用户的生词表
     todo:支持多种格式的来源，目前支持的格式为：每词三行，单词音标中文各占一行每词三行，单词音标中文各占一行。
-    :param user_name:用户的名称
+    :param dictionary_name:用户的名称
     :param src_type:用户提供的单词表的类型
     :param src_file_url:用户提供的单词表的文件位置
     :return:生成一个.db文件
     """
-    database_name = './data/' + user_name + '_dictionary.db'
+    database_name = './data/' + dictionary_name + '_dictionary.db'
     conn = sqlite3.connect(database_name)
     curs = conn.cursor()
 
