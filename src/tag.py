@@ -59,16 +59,20 @@ def get_wordnet_pos(tag):
 def tag_passage(passage, database_url):
     """
     根据指定的生词词库标注一段文本
-    todo:增加功能，比如：生成单词表
+    todo:增加功能，比如：生成单词表、
+    todo:将查表改成事先读入缓存
     :param passage:待处理的文本
     :param database_url:指定的生词词库
     :return:返回标注后的文本。
     """
 
     '''连接数据库'''
-    conn = sqlite3.connect(database_url)
-    conn.row_factory = dict_factory
-    curs = conn.cursor()
+    disk_db = sqlite3.connect(database_url)
+    mem_db = sqlite3.connect(':memory:')
+    mem_db.executescript("".join(line for line in disk_db.iterdump()))  # 把数据库内容从磁盘转到内存
+
+    mem_db.row_factory = dict_factory
+    curs = mem_db.cursor()
 
     newPassage = ""
     paragraphs = passage.split('\n')  # 将文章分割成段落
@@ -117,7 +121,7 @@ def tag_file(file_url, database_url):
     logging.debug(new_file_url)
     print(new_file_url)
 
-    with open(new_file_url,'w',encoding='UTF-8') as new_file:
+    with open(new_file_url, 'w', encoding='UTF-8') as new_file:
         newPassage += '\n'
         new_file.write(newPassage)
     print(newPassage)
