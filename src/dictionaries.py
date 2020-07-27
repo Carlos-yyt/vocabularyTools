@@ -25,8 +25,8 @@ def txt2excel(file_path, audio_path):
     :param audio_path:音频库
     :return:生成excel形式的单词表
     """
-    path, tempfilename = os.path.split(file_path)  # 分离文件名与扩展名
-    filename, extension = os.path.splitext(tempfilename)
+    path, temp_file_name = os.path.split(file_path)  # 分离文件名与扩展名
+    filename, extension = os.path.splitext(temp_file_name)
     input_file_url = file_path
     output_file_url = path + '\\' + filename + '.xls'
 

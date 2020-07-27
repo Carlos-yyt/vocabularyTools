@@ -36,16 +36,17 @@ def create_dictionaries(dictionary_name, src_type, src_file_url):
 
     """逐行导入数据库"""
     with open(src_file_url, encoding='utf-8') as file_object:
+        # todo:当数据库存在的时候，就删掉重建一个
         for index, line in enumerate(file_object):  # 逐行读取
             if index % 3 == 0:
                 _word = line.strip('\n')  # 第一列：单词
                 logging.debug(_word)
             elif index % 3 == 1:
-                _translation = line.strip('\n')  # 第二列：释义
-                logging.debug(_translation)
-            else:
-                _ipa = line.strip('\n')  # 第三列：国际音标
+                _ipa = line.strip('\n')  # 第二列：释义
                 logging.debug(_ipa)
+            else:
+                _translation = line.strip('\n')  # 第三列：国际音标
+                logging.debug(_translation)
                 _audio = './audio/' + _word + '.mp3'  # 第四列：音频文件地址
                 logging.debug(_audio)
                 sql_exec = "INSERT OR IGNORE INTO words VALUES (?,?,?,?,?)"  # ignore:防止用户提供的题库有重复单词
