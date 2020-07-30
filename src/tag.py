@@ -28,13 +28,6 @@ def keep_first_translation(translation):
     :return: 单词的第一个释义
     """
     briefTranslation = china.findall(translation)[0]  # 默认取第一个解释
-
-    # briefTranslation = ""
-    # for char in translation:
-    #     if u'\u4e00' <= char <= u'\u9fff':  # 中文的范围
-    #         briefTranslation = briefTranslation + char
-    #     else:
-    #         break
     return briefTranslation
 
 
@@ -60,7 +53,6 @@ def tag_passage(passage, database_url):
     """
     根据指定的生词词库标注一段文本
     todo:增加功能，比如：生成单词表、
-    todo:将查表改成事先读入缓存
     :param passage:待处理的文本
     :param database_url:指定的生词词库
     :return:返回标注后的文本。
