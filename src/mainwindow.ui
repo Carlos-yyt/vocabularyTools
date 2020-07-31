@@ -6,39 +6,140 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>872</width>
-    <height>662</height>
+    <width>919</width>
+    <height>548</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>VocabularyTools</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>891</width>
+      <height>481</height>
+     </rect>
+    </property>
+    <widget class="QWidget" name="page_translatePassage">
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>54</width>
+        <height>12</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>当前词库：</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cur_database">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>10</y>
+        <width>441</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPlainTextEdit" name="plainTextEdit_input">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>50</y>
+        <width>351</width>
+        <height>431</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="textBrowser_output">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>50</y>
+        <width>491</width>
+        <height>431</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>中文</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>383</x>
+        <y>30</y>
+        <width>51</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>英文</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_2"/>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>872</width>
+     <width>919</width>
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="action_5"/>
-    <addaction name="action_6"/>
+    <addaction name="action_new_file"/>
+    <addaction name="action_open_file"/>
+    <addaction name="action_save_file"/>
    </widget>
-   <widget class="QMenu" name="menu_3">
+   <widget class="QMenu" name="menu_database">
     <property name="title">
      <string>词库</string>
     </property>
-    <addaction name="action_3"/>
-    <addaction name="action_7"/>
+    <widget class="QMenu" name="menu_import_wordlist">
+     <property name="title">
+      <string>导入外部词库</string>
+     </property>
+     <addaction name="import_woaibeidanci"/>
+    </widget>
+    <addaction name="menu_import_wordlist"/>
+    <addaction name="action_choose_database"/>
    </widget>
-   <addaction name="menu"/>
-   <addaction name="menu_3"/>
+   <widget class="QMenu" name="menu_tools">
+    <property name="title">
+     <string>工具</string>
+    </property>
+    <addaction name="action_tag_Text"/>
+    <addaction name="action_word_list"/>
+   </widget>
+   <addaction name="menu_file"/>
+   <addaction name="menu_database"/>
+   <addaction name="menu_tools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_2">
@@ -46,24 +147,39 @@
     <string>词库</string>
    </property>
   </action>
-  <action name="action_3">
-   <property name="text">
-    <string>导入外部词库</string>
-   </property>
-  </action>
-  <action name="action_5">
+  <action name="action_new_file">
    <property name="text">
     <string>新建</string>
    </property>
   </action>
-  <action name="action_6">
+  <action name="action_open_file">
    <property name="text">
     <string>打开</string>
    </property>
   </action>
-  <action name="action_7">
+  <action name="action_choose_database">
    <property name="text">
     <string>指定词库</string>
+   </property>
+  </action>
+  <action name="action_tag_Text">
+   <property name="text">
+    <string>标注文本</string>
+   </property>
+  </action>
+  <action name="action_word_list">
+   <property name="text">
+    <string>生成单词表</string>
+   </property>
+  </action>
+  <action name="action_save_file">
+   <property name="text">
+    <string>保存</string>
+   </property>
+  </action>
+  <action name="import_woaibeidanci">
+   <property name="text">
+    <string>我爱背单词</string>
    </property>
   </action>
  </widget>
