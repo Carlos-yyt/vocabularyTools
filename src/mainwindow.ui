@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>919</width>
-    <height>548</height>
+    <height>605</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>10</y>
       <width>891</width>
-      <height>481</height>
+      <height>541</height>
      </rect>
     </property>
     <widget class="QWidget" name="page_translatePassage">
@@ -28,7 +28,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>10</y>
+        <y>30</y>
         <width>54</width>
         <height>12</height>
        </rect>
@@ -41,8 +41,8 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>10</y>
-        <width>441</width>
+        <y>30</y>
+        <width>791</width>
         <height>16</height>
        </rect>
       </property>
@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>50</y>
+        <y>70</y>
         <width>351</width>
-        <height>431</height>
+        <height>461</height>
        </rect>
       </property>
      </widget>
@@ -64,9 +64,9 @@
       <property name="geometry">
        <rect>
         <x>380</x>
-        <y>50</y>
+        <y>70</y>
         <width>491</width>
-        <height>431</height>
+        <height>461</height>
        </rect>
       </property>
      </widget>
@@ -74,7 +74,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>30</y>
+        <y>50</y>
         <width>31</width>
         <height>16</height>
        </rect>
@@ -86,14 +86,40 @@
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>383</x>
-        <y>30</y>
+        <x>380</x>
+        <y>50</y>
         <width>51</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
        <string>英文</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>54</width>
+        <height>12</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>当前文件：</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_cur_passage">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>10</y>
+        <width>791</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>

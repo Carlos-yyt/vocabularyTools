@@ -5,13 +5,14 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-def create_dictionaries(dictionary_name, src_type, src_file_url):
+def create_dictionaries(dictionary_name, src_type, src_wordList_url, src_audio_url):
     """
     根据用户提供的单词表创建一个该用户的生词表
     todo:支持多种格式的来源，目前支持的格式为：每词三行，单词音标中文各占一行每词三行，单词音标中文各占一行。
+    :param src_audio_url: 用户提供的音频文件夹地址
     :param dictionary_name:用户的名称
     :param src_type:用户提供的单词表的类型
-    :param src_file_url:用户提供的单词表的文件位置
+    :param src_wordList_url:用户提供的单词表的文件位置
     :return:生成一个.db文件
     """
     database_name = './data/' + dictionary_name + '_dictionary.db'
@@ -35,7 +36,7 @@ def create_dictionaries(dictionary_name, src_type, src_file_url):
     curs.execute(sql_exec)
 
     """逐行导入数据库"""
-    with open(src_file_url, encoding='utf-8') as file_object:
+    with open(src_wordList_url, encoding='utf-8') as file_object:
         # todo:当数据库存在的时候，就删掉重建一个
         for index, line in enumerate(file_object):  # 逐行读取
             if index % 3 == 0:
@@ -47,7 +48,7 @@ def create_dictionaries(dictionary_name, src_type, src_file_url):
             else:
                 _translation = line.strip('\n')  # 第三列：国际音标
                 logging.debug(_translation)
-                _audio = './audio/' + _word + '.mp3'  # 第四列：音频文件地址
+                _audio = src_audio_url+'\\' + _word + '.mp3'  # 第四列：音频文件地址
                 logging.debug(_audio)
                 sql_exec = "INSERT OR IGNORE INTO words VALUES (?,?,?,?,?)"  # ignore:防止用户提供的题库有重复单词
                 curs.execute(sql_exec, (_word, _translation, _ipa, _audio, 0))  # 遇到的次数 初始为0

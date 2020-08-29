@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import string
+import xlwt
 from nltk.stem import WordNetLemmatizer
 import nltk
 import logging
@@ -55,7 +56,7 @@ def tag_passage(passage, database_url):
     todo:增加功能，比如：生成单词表、
     :param passage:待处理的文本
     :param database_url:指定的生词词库
-    :return:返回标注后的文本。
+    :return:返回标注后的文本、生词表（每一行包括：单词、释义、音标、音频地址）。
     """
 
     '''连接数据库'''
@@ -67,17 +68,19 @@ def tag_passage(passage, database_url):
     curs = mem_db.cursor()
 
     newPassage = ""
+    wordList_pure = []  # 一词一行的纯单词表，用于导入其他软件。
+    wordList_learn = []  # 每一行包括：单词、释义、音标，用于直接学习。
     paragraphs = passage.split('\n')  # 将文章分割成段落
     for curPara in paragraphs:
         words = nltk.word_tokenize(curPara)  # 将段落分割成单词
         for curWord in words:
-            if curWord not in string.punctuation:  # 如果不是标点符号
+            if curWord[0] not in string.punctuation:  # 如果第一个不是标点符号。为什么是第一个：it's会被拆分成it和's，其中's应该忽略。
                 lowWord = curWord.lower()  # 把所有单词中的大写字母转换成小写字母
                 pos = get_wordnet_pos(nltk.pos_tag(lowWord)[0][1]) or wordnet.NOUN  # 获取词性
                 rootWord = lemmatizer.lemmatize(lowWord, pos)  # 词形还原
 
                 sqlExec = """
-                    SELECT translation, IPA, audio
+                    SELECT translation, IPA, audio, audio
                     FROM words
                     WHERE word='%s'
                     """ % rootWord
@@ -85,6 +88,11 @@ def tag_passage(passage, database_url):
                 cursor = curs.execute(sqlExec)
                 resultDict = cursor.fetchone()
                 if resultDict is not None:  # 查到了单词
+                    if rootWord not in wordList_pure:  # 第一次出现的生词
+                        wordList_pure.append(rootWord)
+                        wordList_learn_line = [rootWord, resultDict['translation'], resultDict['IPA'],
+                                               resultDict['audio']]
+                        wordList_learn.append(wordList_learn_line)  # 包括：单词、释义、音标，用于直接学习。
                     newPassage += curWord + "(" + keep_first_translation(resultDict['translation']) + ")" + " "
                 else:
                     newPassage += curWord + " "
@@ -93,7 +101,7 @@ def tag_passage(passage, database_url):
                 newPassage += curWord + " "  # 标点符号
         newPassage += "\n"  # 复原的时候加上回车符
 
-    return newPassage
+    return newPassage, wordList_learn
 
 
 def tag_file(file_url, database_url):
@@ -105,15 +113,32 @@ def tag_file(file_url, database_url):
     """
     with open(file_url, encoding='UTF-8') as file_object:
         passage = file_object.read()
-        newPassage = tag_passage(passage, database_url)
+        newPassage, wordList = tag_passage(passage, database_url)
     path, temp_filename = os.path.split(file_url)
     new_filename, extension = os.path.splitext(temp_filename)
-    new_file_url = path + '\\' + new_filename + '_标注版.txt'
+    new_passage_url = path + '\\' + new_filename + '_标注版.txt'
+    new_wordList_pure_url = path + '\\' + new_filename + '_纯单词表.txt'
+    new_wordList_learn_url = path + '\\' + new_filename + '_可学习的单词表.xls'
     logging.debug("new_file_url")
-    logging.debug(new_file_url)
-    print(new_file_url)
+    logging.debug(new_passage_url)
 
-    with open(new_file_url, 'w', encoding='UTF-8') as new_file:
+    # 生成标注的文章
+    with open(new_passage_url, 'w', encoding='UTF-8') as new_file:
         newPassage += '\n'
         new_file.write(newPassage)
-    print(newPassage)
+
+    # 生成纯单词表
+    with open(new_wordList_pure_url, 'w', encoding='UTF-8') as new_file:
+        for word in wordList:
+            new_file.write(word[0] + '\n')  # 只写单词
+
+    # 生成可以直接学习的单词表
+    book = xlwt.Workbook(encoding='utf-8', style_compression=0)  # 创建工作簿
+    sheet = book.add_sheet('单词页', cell_overwrite_ok=True)  # 创建数据表
+    sheet.col(1).width = 256 * 20
+    for i in range(0, len(wordList)):
+        sheet.write(i, 0, xlwt.Formula(
+            'HYPERLINK("%s";"%s")' % (wordList[i][3], wordList[i][0])))  # 第一列：显示单词，点击的时候跳转音频文件的超链接。
+        sheet.write(i, 1, wordList[i][1])  # 第二列：释义
+        sheet.write(i, 2, wordList[i][2])  # 第三列：音标
+    book.save(new_wordList_learn_url)
