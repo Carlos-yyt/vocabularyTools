@@ -1,5 +1,7 @@
+import chardet
 import xlwt
 import os
+from xml.dom import minidom
 
 
 def keep_first_translation(translation):
@@ -48,3 +50,61 @@ def txt2excel(file_path, audio_path):
         sheet.write(i, 3, keep_first_translation(lines[i * 3 + 2]))  # 第四列：简明释义
         sheet.write(i, 4, audio_path + lines[i * 3] + '.mp3')  # 第五列：单词音频文件位置
     book.save(output_file_url)
+
+
+def wordList_2_YouDao(wordList, file_url, tag, progress):
+    """
+    根据wordList生成可以导入有道词典的XML文件
+    :param wordList: 单词表
+    :param file_url: 生成的XML文件的地址
+    :param tag: 该组单词的分类
+    :param progress: 复习进度（默认为1）
+    :return:在file_url指定的位置生成一个可以导入有道词典的XML文件
+    """
+    domTree = minidom.Document()
+    # 文档根元素
+    rootNode = domTree
+    # 新建一个wordbook节点
+    wordbook_node = domTree.createElement("wordbook")
+
+    for word in wordList:
+        # 创建item节点
+        item_node = domTree.createElement("item")
+        wordbook_node.appendChild(item_node)
+
+        # 创建word节点,并设置textValue
+        word_node = domTree.createElement("word")
+        phone_text_value = domTree.createTextNode(word[0].encode('unicode_escape').decode('utf-8'))
+        word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
+        item_node.appendChild(word_node)
+
+        # # 创建trans节点,并设置textValue
+        # word_node = domTree.createElement("trans")
+        # phone_text_value = domTree.createCDATASection(word[1].encode('unicode_escape').decode('utf-8'))
+        # word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
+        # item_node.appendChild(word_node)
+
+        # # 创建phonetic节点,并设置textValue
+        # word_node = domTree.createElement("phonetic")
+        # phone_text_value = domTree.createCDATASection(word[2].encode('unicode_escape').decode('utf-8'))
+        # word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
+        # item_node.appendChild(word_node)
+
+        # 创建tags节点,并设置textValue
+        word_node = domTree.createElement("tags")
+        phone_text_value = domTree.createTextNode(tag.encode('unicode_escape').decode('utf-8'))
+        word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
+        item_node.appendChild(word_node)
+
+        # # 创建progress节点,并设置textValue
+        # word_node = domTree.createElement("progress")
+        # print(progress,chardet.detect(str.encode(progress.encode('unicode_escape').decode('utf-8'))))
+        # phone_text_value = domTree.createTextNode(progress.encode('unicode_escape').decode('utf-8'))
+        # word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
+        # item_node.appendChild(word_node)
+
+    rootNode.appendChild(wordbook_node)
+
+    with open(file_url, 'w') as f:
+        # 缩进 - 换行 - 编码
+        domTree.writexml(f, indent='\t', addindent='\t', newl='\n', encoding='utf-8')

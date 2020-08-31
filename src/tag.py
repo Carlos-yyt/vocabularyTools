@@ -6,6 +6,7 @@ from nltk.stem import WordNetLemmatizer
 import nltk
 import logging
 import re
+import src.dictionaries
 
 china = re.compile(r'[\u4e00-\u9fa5]+')  # 匹配连续中文
 
@@ -92,7 +93,7 @@ def tag_passage(passage, database_url):
                         wordList_pure.append(rootWord)
                         wordList_learn_line = [rootWord, resultDict['translation'], resultDict['IPA'],
                                                resultDict['audio']]
-                        wordList_learn.append(wordList_learn_line)  # 包括：单词、释义、音标，用于直接学习。
+                        wordList_learn.append(wordList_learn_line)  # 包括：单词、释义、音标、音频地址，用于直接学习。
                     newPassage += curWord + "(" + keep_first_translation(resultDict['translation']) + ")" + " "
                 else:
                     newPassage += curWord + " "
@@ -113,12 +114,24 @@ def tag_file(file_url, database_url):
     """
     with open(file_url, encoding='UTF-8') as file_object:
         passage = file_object.read()
-        newPassage, wordList = tag_passage(passage, database_url)
+        newPassage, wordList = tag_passage(passage, database_url)  # newPassage为新标注好的文章、wordList为单词表（单词、释义、音标、音频地址）
     path, temp_filename = os.path.split(file_url)
     new_filename, extension = os.path.splitext(temp_filename)
+
+    # 为每一个待翻译的文章建立文件夹
+    path = path.strip()
+    path = path.rstrip("\\")
+    path = path + "\\" + new_filename
+    isExists = os.path.exists(path)
+    if not isExists:
+        os.makedirs(path)
+
+    print(path)
     new_passage_url = path + '\\' + new_filename + '_标注版.txt'
-    new_wordList_pure_url = path + '\\' + new_filename + '_纯单词表.txt'
-    new_wordList_learn_url = path + '\\' + new_filename + '_可学习的单词表.xls'
+    new_wordList_url = path + '\\' + new_filename + '_纯单词表.txt'
+    new_wordList_learn_url = path + '\\' + new_filename + '_可点读的单词表.xls'
+    new_wordList_print_url = path + '\\' + new_filename + '_可打印学习的单词表.txt'
+    new_wordList_youdao_url = path + '\\' + new_filename + '_可以导入有道词典.xml'
     logging.debug("new_file_url")
     logging.debug(new_passage_url)
 
@@ -128,11 +141,11 @@ def tag_file(file_url, database_url):
         new_file.write(newPassage)
 
     # 生成纯单词表
-    with open(new_wordList_pure_url, 'w', encoding='UTF-8') as new_file:
+    with open(new_wordList_url, 'w', encoding='UTF-8') as new_file:
         for word in wordList:
             new_file.write(word[0] + '\n')  # 只写单词
 
-    # 生成可以直接学习的单词表
+    # 生成点读的单词表
     book = xlwt.Workbook(encoding='utf-8', style_compression=0)  # 创建工作簿
     sheet = book.add_sheet('单词页', cell_overwrite_ok=True)  # 创建数据表
     sheet.col(1).width = 256 * 20
@@ -142,3 +155,16 @@ def tag_file(file_url, database_url):
         sheet.write(i, 1, wordList[i][1])  # 第二列：释义
         sheet.write(i, 2, wordList[i][2])  # 第三列：音标
     book.save(new_wordList_learn_url)
+
+    # 生成可打印学习的单词表
+    with open(new_wordList_print_url, 'w', encoding='UTF-8') as new_file:
+        for word in wordList:
+            new_file.write('{:20s}{:20s}{}'.format(word[0], word[1], " " * (25 - len(word[1])) + word[2] + '\n'))
+
+    # 生成可以导入有道词典的XML文件
+    with open(new_wordList_youdao_url, 'w', encoding='utf-8') as new_file:
+        src.dictionaries.wordList_2_YouDao(wordList, new_wordList_youdao_url, "know", "1")
+
+
+def tag_files_and_mer(dir_url, database_url):
+    pass
