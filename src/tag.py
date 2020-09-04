@@ -112,28 +112,30 @@ def tag_file(file_url, database_url):
     :param database_url: 生词数据库路径
     :return: 返回一个标注好的txt文件
     """
+    logging.debug("Try to open file from: "+file_url+", use database from: "+database_url)
     with open(file_url, encoding='UTF-8') as file_object:
         passage = file_object.read()
         newPassage, wordList = tag_passage(passage, database_url)  # newPassage为新标注好的文章、wordList为单词表（单词、释义、音标、音频地址）
+
     path, temp_filename = os.path.split(file_url)
     new_filename, extension = os.path.splitext(temp_filename)
+
+    logging.debug("The annotation work for "+temp_filename+" is complete.")
 
     # 为每一个待翻译的文章建立文件夹
     path = path.strip()
     path = path.rstrip("\\")
     path = path + "\\" + new_filename
+    logging.debug("All generated files are placed in "+path)
     isExists = os.path.exists(path)
     if not isExists:
         os.makedirs(path)
 
-    print(path)
     new_passage_url = path + '\\' + new_filename + '_标注版.txt'
     new_wordList_url = path + '\\' + new_filename + '_纯单词表.txt'
     new_wordList_learn_url = path + '\\' + new_filename + '_可点读的单词表.xls'
     new_wordList_print_url = path + '\\' + new_filename + '_可打印学习的单词表.txt'
     new_wordList_youdao_url = path + '\\' + new_filename + '_可以导入有道词典.xml'
-    logging.debug("new_file_url")
-    logging.debug(new_passage_url)
 
     # 生成标注的文章
     with open(new_passage_url, 'w', encoding='UTF-8') as new_file:
@@ -166,5 +168,21 @@ def tag_file(file_url, database_url):
         src.dictionaries.wordList_2_YouDao(wordList, new_wordList_youdao_url, "know", "1")
 
 
-def tag_files_and_mer(dir_url, database_url):
-    pass
+def tag_dir(dir_path, database_url):
+    """
+    TODO: 把一个文件夹里的文章都标注了，并且整合出一个单词总表。单词总表是分课的。
+    :param dir_path:
+    :param database_url:
+    :return:
+    """
+    res_url = dir_path + "/" + os.path.split(dir_path)[1] + "_all.txt"  # 用最后一个文件夹的名字命名生成的文件
+    res_file = open(res_url, "w", encoding='utf-8')
+    for root, dirs, files in os.walk(dir_path, topdown=False):
+        for file in files:
+            pass
+            # res_file.writelines("===The following comes from file < " + file + ' > ===\n\n')
+            # logging.debug("Copying file "+os.path.join(root, file))
+            # for line in open(os.path.join(root, file), encoding='utf-8'):
+            #     res_file.writelines(line)
+            # logging.debug("Copying finished.")
+            # res_file.writelines("\n\nFile < " + file + ' > ends.\n\n')

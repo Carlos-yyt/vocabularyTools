@@ -2,7 +2,7 @@ import chardet
 import xlwt
 import os
 from xml.dom import minidom
-
+import logging
 
 def keep_first_translation(translation):
     """
@@ -55,6 +55,7 @@ def txt2excel(file_path, audio_path):
 def wordList_2_YouDao(wordList, file_url, tag, progress):
     """
     根据wordList生成可以导入有道词典的XML文件
+    TODO:生成的XML要手动把编码改成utf-8
     :param wordList: 单词表
     :param file_url: 生成的XML文件的地址
     :param tag: 该组单词的分类
@@ -78,11 +79,13 @@ def wordList_2_YouDao(wordList, file_url, tag, progress):
         word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
         item_node.appendChild(word_node)
 
-        # # 创建trans节点,并设置textValue
-        # word_node = domTree.createElement("trans")
+        # 创建trans节点,并设置textValue
+        word_node = domTree.createElement("trans")
         # phone_text_value = domTree.createCDATASection(word[1].encode('unicode_escape').decode('utf-8'))
-        # word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
-        # item_node.appendChild(word_node)
+        phone_text_value = domTree.createCDATASection(word[1])
+        print(chardet.detect(str.encode(word[1])))
+        word_node.appendChild(phone_text_value)  # 把文本节点挂到name_node节点
+        item_node.appendChild(word_node)
 
         # # 创建phonetic节点,并设置textValue
         # word_node = domTree.createElement("phonetic")
@@ -108,3 +111,22 @@ def wordList_2_YouDao(wordList, file_url, tag, progress):
     with open(file_url, 'w') as f:
         # 缩进 - 换行 - 编码
         domTree.writexml(f, indent='\t', addindent='\t', newl='\n', encoding='utf-8')
+
+
+def merge_txt(dir_path):
+    """
+    合并指定文件夹下的所有txt文件
+    :param dir_path:指定的文件夹路径
+    :return:生成一个txt文件
+    """
+    res_url = dir_path + "/" + os.path.split(dir_path)[1] + "_all.txt"  # 用最后一个文件夹的名字命名生成的文件
+    res_file = open(res_url, "w", encoding='utf-8')
+    for root, dirs, files in os.walk(dir_path, topdown=False):
+        for file in files:
+            res_file.writelines("===The following comes from file < " + file + ' > ===\n\n')
+            logging.debug("Copying file "+os.path.join(root, file))
+            for line in open(os.path.join(root, file), encoding='utf-8'):
+                res_file.writelines(line)
+            logging.debug("Copying finished.")
+            res_file.writelines("\n\nFile < " + file + ' > ends.\n\n')
+    res_file.close()
